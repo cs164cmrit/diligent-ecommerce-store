@@ -1,0 +1,1347 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>E-Commerce Store</title>
+
+    <!-- React, ReactDOM, and Babel from CDN -->
+    <script
+      crossorigin
+      src="https://unpkg.com/react@18/umd/react.production.min.js"
+    ></script>
+    <script
+      crossorigin
+      src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"
+    ></script>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+
+    <style>
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+
+      body {
+        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Roboto",
+          "Oxygen", sans-serif;
+        background-color: #f5f5f5;
+      }
+
+      /* Header */
+      .header {
+        background-color: #2c3e50;
+        color: white;
+        padding: 15px 0;
+        box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        position: sticky;
+        top: 0;
+        z-index: 1000;
+      }
+
+      .header-content {
+        max-width: 1400px;
+        margin: 0 auto;
+        padding: 0 20px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+      }
+
+      .logo {
+        font-size: 24px;
+        font-weight: 600;
+        cursor: pointer;
+      }
+
+      .nav {
+        display: flex;
+        gap: 25px;
+      }
+
+      .nav-link {
+        color: white;
+        cursor: pointer;
+        font-size: 16px;
+        position: relative;
+        transition: color 0.3s;
+      }
+
+      .nav-link:hover {
+        color: #3498db;
+      }
+
+      .cart-badge {
+        position: absolute;
+        top: -8px;
+        right: -12px;
+        background-color: #e74c3c;
+        color: white;
+        border-radius: 50%;
+        width: 20px;
+        height: 20px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 12px;
+        font-weight: bold;
+      }
+
+      /* Main Content */
+      .main-content {
+        max-width: 1400px;
+        margin: 0 auto;
+        padding: 20px;
+        min-height: calc(100vh - 150px);
+      }
+
+      /* Page Header */
+      .page-header {
+        text-align: center;
+        margin-bottom: 40px;
+      }
+
+      .page-header h1 {
+        font-size: 36px;
+        color: #2c3e50;
+        margin-bottom: 10px;
+      }
+
+      .page-header p {
+        color: #7f8c8d;
+        font-size: 18px;
+      }
+
+      /* Filters */
+      .filters {
+        margin-bottom: 30px;
+      }
+
+      .search-input {
+        width: 100%;
+        max-width: 500px;
+        padding: 12px 20px;
+        font-size: 16px;
+        border: 2px solid #e0e0e0;
+        border-radius: 8px;
+        margin-bottom: 20px;
+      }
+
+      .search-input:focus {
+        outline: none;
+        border-color: #3498db;
+      }
+
+      .category-filters {
+        display: flex;
+        gap: 10px;
+        flex-wrap: wrap;
+      }
+
+      .category-btn {
+        padding: 10px 20px;
+        border: 2px solid #e0e0e0;
+        background: white;
+        border-radius: 25px;
+        cursor: pointer;
+        font-size: 14px;
+        font-weight: 600;
+        transition: all 0.3s;
+      }
+
+      .category-btn:hover {
+        border-color: #3498db;
+        color: #3498db;
+      }
+
+      .category-btn.active {
+        background-color: #3498db;
+        color: white;
+        border-color: #3498db;
+      }
+
+      /* Products Grid */
+      .products-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+        gap: 25px;
+      }
+
+      .product-card {
+        background: white;
+        border-radius: 12px;
+        overflow: hidden;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        transition: transform 0.3s, box-shadow 0.3s;
+        cursor: pointer;
+      }
+
+      .product-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 4px 16px rgba(0, 0, 0, 0.15);
+      }
+
+      .product-image-container {
+        position: relative;
+        width: 100%;
+        height: 200px;
+        background-color: #f8f9fa;
+      }
+
+      .product-image {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+      }
+
+      .stock-badge {
+        position: absolute;
+        top: 10px;
+        right: 10px;
+        padding: 5px 10px;
+        border-radius: 5px;
+        font-size: 12px;
+        font-weight: 600;
+        color: white;
+      }
+
+      .low-stock {
+        background-color: #ff9800;
+      }
+
+      .out-of-stock {
+        background-color: #f44336;
+      }
+
+      .product-info {
+        padding: 15px;
+      }
+
+      .product-category {
+        color: #3498db;
+        font-size: 12px;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        margin-bottom: 5px;
+      }
+
+      .product-name {
+        font-size: 18px;
+        font-weight: 600;
+        margin: 5px 0;
+        color: #2c3e50;
+      }
+
+      .product-description {
+        color: #7f8c8d;
+        font-size: 14px;
+        margin: 10px 0;
+        line-height: 1.4;
+      }
+
+      .product-price {
+        font-size: 22px;
+        font-weight: 700;
+        color: #27ae60;
+        margin-top: 10px;
+      }
+
+      /* Product Details */
+      .product-details {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 50px;
+        background: white;
+        padding: 40px;
+        border-radius: 12px;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+      }
+
+      .product-detail-image-container {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
+
+      .product-detail-image {
+        width: 100%;
+        max-width: 500px;
+        border-radius: 12px;
+      }
+
+      .product-detail-info h1 {
+        font-size: 32px;
+        color: #2c3e50;
+        margin-bottom: 10px;
+      }
+
+      .product-detail-price {
+        font-size: 36px;
+        font-weight: 700;
+        color: #27ae60;
+        margin: 20px 0;
+      }
+
+      .stock-info {
+        padding: 10px 0;
+        font-weight: 600;
+      }
+
+      .in-stock {
+        color: #27ae60;
+      }
+
+      .product-detail-description {
+        color: #555;
+        line-height: 1.6;
+        margin: 20px 0;
+        font-size: 16px;
+      }
+
+      .quantity-controls {
+        display: flex;
+        gap: 10px;
+        align-items: center;
+        margin: 20px 0;
+      }
+
+      .qty-btn {
+        width: 40px;
+        height: 40px;
+        border: 2px solid #ddd;
+        background: white;
+        border-radius: 8px;
+        cursor: pointer;
+        font-size: 20px;
+        font-weight: 600;
+        transition: all 0.3s;
+      }
+
+      .qty-btn:hover {
+        background-color: #f0f0f0;
+        border-color: #3498db;
+      }
+
+      .qty-input {
+        width: 80px;
+        height: 40px;
+        text-align: center;
+        border: 2px solid #ddd;
+        border-radius: 8px;
+        font-size: 16px;
+        font-weight: 600;
+      }
+
+      .add-to-cart-btn {
+        width: 100%;
+        padding: 15px;
+        background-color: #3498db;
+        color: white;
+        border: none;
+        border-radius: 8px;
+        font-size: 18px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: background-color 0.3s;
+        margin-top: 10px;
+      }
+
+      .add-to-cart-btn:hover {
+        background-color: #2980b9;
+      }
+
+      .success-message {
+        padding: 12px;
+        background-color: #d4edda;
+        color: #155724;
+        border: 1px solid #c3e6cb;
+        border-radius: 8px;
+        text-align: center;
+        font-weight: 600;
+        margin-top: 15px;
+      }
+
+      .product-features {
+        margin-top: 20px;
+        padding: 20px;
+        background-color: #f8f9fa;
+        border-radius: 8px;
+      }
+
+      .product-features h3 {
+        color: #2c3e50;
+        margin-bottom: 15px;
+      }
+
+      .product-features ul {
+        list-style: none;
+        padding: 0;
+      }
+
+      .product-features li {
+        padding: 8px 0;
+        color: #555;
+        position: relative;
+        padding-left: 25px;
+      }
+
+      .product-features li:before {
+        content: "✓";
+        position: absolute;
+        left: 0;
+        color: #27ae60;
+        font-weight: bold;
+      }
+
+      /* Cart */
+      .cart-container {
+        display: grid;
+        grid-template-columns: 1fr 400px;
+        gap: 30px;
+      }
+
+      .cart-item {
+        display: flex;
+        gap: 20px;
+        background: white;
+        padding: 20px;
+        border-radius: 8px;
+        margin-bottom: 15px;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+      }
+
+      .cart-item-image {
+        width: 120px;
+        height: 120px;
+        object-fit: cover;
+        border-radius: 8px;
+        flex-shrink: 0;
+      }
+
+      .cart-item-details {
+        flex: 1;
+      }
+
+      .cart-item-name {
+        font-size: 18px;
+        font-weight: 600;
+        color: #2c3e50;
+        margin-bottom: 10px;
+      }
+
+      .cart-item-price {
+        font-size: 16px;
+        color: #27ae60;
+        font-weight: 600;
+      }
+
+      .cart-item-actions {
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+        align-items: flex-end;
+      }
+
+      .cart-item-subtotal {
+        font-size: 16px;
+        font-weight: 600;
+        color: #2c3e50;
+        text-align: right;
+      }
+
+      .remove-btn {
+        padding: 8px 15px;
+        background-color: #e74c3c;
+        color: white;
+        border: none;
+        border-radius: 4px;
+        cursor: pointer;
+        font-size: 14px;
+        transition: background-color 0.3s;
+      }
+
+      .remove-btn:hover {
+        background-color: #c0392b;
+      }
+
+      .cart-summary {
+        background: white;
+        padding: 25px;
+        border-radius: 12px;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        height: fit-content;
+        position: sticky;
+        top: 100px;
+      }
+
+      .cart-summary h2 {
+        font-size: 24px;
+        color: #2c3e50;
+        margin-bottom: 20px;
+      }
+
+      .summary-row {
+        display: flex;
+        justify-content: space-between;
+        padding: 12px 0;
+        color: #555;
+        font-size: 16px;
+      }
+
+      .summary-divider {
+        height: 1px;
+        background-color: #e0e0e0;
+        margin: 15px 0;
+      }
+
+      .summary-row.total {
+        font-size: 20px;
+        font-weight: 700;
+        color: #2c3e50;
+        border-top: 2px solid #e0e0e0;
+        margin-top: 10px;
+        padding-top: 15px;
+      }
+
+      .checkout-btn {
+        width: 100%;
+        padding: 15px;
+        background-color: #27ae60;
+        color: white;
+        border: none;
+        border-radius: 8px;
+        font-size: 18px;
+        font-weight: 600;
+        cursor: pointer;
+        margin-top: 20px;
+        transition: background-color 0.3s;
+      }
+
+      .checkout-btn:hover {
+        background-color: #229954;
+      }
+
+      .clear-cart-btn {
+        width: 100%;
+        padding: 12px;
+        background-color: #e74c3c;
+        color: white;
+        border: none;
+        border-radius: 8px;
+        font-size: 16px;
+        font-weight: 600;
+        cursor: pointer;
+        margin-top: 10px;
+        transition: background-color 0.3s;
+      }
+
+      .clear-cart-btn:hover {
+        background-color: #c0392b;
+      }
+
+      .continue-shopping-btn {
+        width: 100%;
+        padding: 12px;
+        background-color: white;
+        color: #3498db;
+        border: 2px solid #3498db;
+        border-radius: 8px;
+        font-size: 16px;
+        font-weight: 600;
+        cursor: pointer;
+        margin-top: 10px;
+        transition: all 0.3s;
+      }
+
+      .continue-shopping-btn:hover {
+        background-color: #3498db;
+        color: white;
+      }
+
+      .back-link {
+        display: inline-block;
+        color: #3498db;
+        margin-bottom: 20px;
+        cursor: pointer;
+        font-weight: 600;
+        font-size: 16px;
+      }
+
+      .back-link:hover {
+        text-decoration: underline;
+      }
+
+      .loading {
+        text-align: center;
+        padding: 50px;
+        font-size: 18px;
+        color: #7f8c8d;
+      }
+
+      .spinner {
+        width: 50px;
+        height: 50px;
+        border: 4px solid #f3f3f3;
+        border-top: 4px solid #3498db;
+        border-radius: 50%;
+        animation: spin 1s linear infinite;
+        margin: 0 auto 15px;
+      }
+
+      @keyframes spin {
+        0% {
+          transform: rotate(0deg);
+        }
+        100% {
+          transform: rotate(360deg);
+        }
+      }
+
+      .empty-cart {
+        text-align: center;
+        padding: 50px;
+      }
+
+      .empty-cart h2 {
+        font-size: 32px;
+        color: #2c3e50;
+        margin-bottom: 15px;
+      }
+
+      .empty-cart p {
+        color: #7f8c8d;
+        font-size: 18px;
+        margin-bottom: 30px;
+      }
+
+      .shop-now-btn {
+        padding: 15px 40px;
+        background-color: #3498db;
+        color: white;
+        border: none;
+        border-radius: 8px;
+        font-size: 18px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: background-color 0.3s;
+      }
+
+      .shop-now-btn:hover {
+        background-color: #2980b9;
+      }
+
+      .error-container {
+        text-align: center;
+        padding: 50px;
+      }
+
+      .error-message {
+        color: #e74c3c;
+        font-size: 18px;
+        margin-bottom: 20px;
+      }
+
+      .retry-btn {
+        padding: 12px 30px;
+        background-color: #3498db;
+        color: white;
+        border: none;
+        border-radius: 8px;
+        cursor: pointer;
+        font-size: 16px;
+        font-weight: 600;
+        transition: background-color 0.3s;
+      }
+
+      .retry-btn:hover {
+        background-color: #2980b9;
+      }
+
+      .footer {
+        background-color: #333;
+        color: white;
+        text-align: center;
+        padding: 20px;
+        margin-top: 40px;
+      }
+
+      /* Responsive */
+      @media (max-width: 968px) {
+        .product-details,
+        .cart-container {
+          grid-template-columns: 1fr;
+        }
+
+        .cart-summary {
+          position: static;
+        }
+
+        .products-grid {
+          grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+        }
+      }
+
+      @media (max-width: 480px) {
+        .page-header h1 {
+          font-size: 28px;
+        }
+
+        .products-grid {
+          grid-template-columns: 1fr;
+        }
+
+        .product-details {
+          padding: 20px;
+        }
+
+        .cart-item {
+          flex-direction: column;
+        }
+
+        .cart-item-image {
+          width: 100%;
+          height: 200px;
+        }
+
+        .cart-item-actions {
+          align-items: flex-start;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div id="root"></div>
+
+    <script type="text/babel">
+      const { useState, useEffect, createContext, useContext } = React;
+
+      // ============================================
+      // CONFIGURATION - CHANGE THIS TO YOUR BACKEND URL
+      // ============================================
+      const API_URL = "http://localhost:5000/api";
+
+      // ============================================
+      // CART CONTEXT
+      // ============================================
+      const CartContext = createContext();
+
+      const CartProvider = ({ children }) => {
+        const [cart, setCart] = useState(() => {
+          const saved = localStorage.getItem("cart");
+          return saved ? JSON.parse(saved) : [];
+        });
+
+        useEffect(() => {
+          localStorage.setItem("cart", JSON.stringify(cart));
+        }, [cart]);
+
+        const addToCart = (product, quantity = 1) => {
+          setCart((prev) => {
+            const existing = prev.find((item) => item.id === product.id);
+            if (existing) {
+              return prev.map((item) =>
+                item.id === product.id
+                  ? { ...item, quantity: item.quantity + quantity }
+                  : item
+              );
+            }
+            return [...prev, { ...product, quantity }];
+          });
+        };
+
+        const removeFromCart = (productId) => {
+          setCart((prev) => prev.filter((item) => item.id !== productId));
+        };
+
+        const updateQuantity = (productId, quantity) => {
+          if (quantity <= 0) {
+            removeFromCart(productId);
+            return;
+          }
+          setCart((prev) =>
+            prev.map((item) =>
+              item.id === productId ? { ...item, quantity } : item
+            )
+          );
+        };
+
+        const getTotalItems = () => {
+          return cart.reduce((sum, item) => sum + item.quantity, 0);
+        };
+
+        const getTotalPrice = () => {
+          return cart.reduce(
+            (sum, item) => sum + item.price * item.quantity,
+            0
+          );
+        };
+
+        const clearCart = () => setCart([]);
+
+        return (
+          <CartContext.Provider
+            value={{
+              cart,
+              addToCart,
+              removeFromCart,
+              updateQuantity,
+              getTotalItems,
+              getTotalPrice,
+              clearCart,
+            }}
+          >
+            {children}
+          </CartContext.Provider>
+        );
+      };
+
+      const useCart = () => useContext(CartContext);
+
+      // ============================================
+      // HEADER COMPONENT
+      // ============================================
+      const Header = ({ onNavigate }) => {
+        const { getTotalItems } = useCart();
+
+        return (
+          <header className="header">
+            <div className="header-content">
+              <div className="logo" onClick={() => onNavigate("home")}>
+                🛒 E-Shop
+              </div>
+              <nav className="nav">
+                <span className="nav-link" onClick={() => onNavigate("home")}>
+                  Products
+                </span>
+                <span
+                  className="nav-link"
+                  onClick={() => onNavigate("cart")}
+                  style={{ position: "relative" }}
+                >
+                  Cart
+                  {getTotalItems() > 0 && (
+                    <span className="cart-badge">{getTotalItems()}</span>
+                  )}
+                </span>
+              </nav>
+            </div>
+          </header>
+        );
+      };
+
+      // ============================================
+      // LOADING COMPONENT
+      // ============================================
+      const Loading = () => (
+        <div className="loading">
+          <div className="spinner"></div>
+          <p>Loading...</p>
+        </div>
+      );
+
+      // ============================================
+      // PRODUCT LIST PAGE
+      // ============================================
+      const ProductList = ({ onNavigate }) => {
+        const [products, setProducts] = useState([]);
+        const [loading, setLoading] = useState(true);
+        const [error, setError] = useState(null);
+        const [search, setSearch] = useState("");
+        const [category, setCategory] = useState("all");
+
+        useEffect(() => {
+          fetchProducts();
+        }, []);
+
+        const fetchProducts = async () => {
+          try {
+            setLoading(true);
+            const response = await fetch(`${API_URL}/products`);
+            if (!response.ok) throw new Error("Failed to fetch products");
+            const data = await response.json();
+            setProducts(data);
+            setError(null);
+          } catch (err) {
+            console.error(err);
+            setError("Failed to load products. Please try again later.");
+          } finally {
+            setLoading(false);
+          }
+        };
+
+        const categories = ["all", ...new Set(products.map((p) => p.category))];
+
+        const filtered = products.filter((p) => {
+          const matchCategory = category === "all" || p.category === category;
+          const matchSearch = p.name
+            .toLowerCase()
+            .includes(search.toLowerCase());
+          return matchCategory && matchSearch;
+        });
+
+        if (loading) return <Loading />;
+
+        if (error) {
+          return (
+            <div className="error-container">
+              <p className="error-message">{error}</p>
+              <button onClick={fetchProducts} className="retry-btn">
+                Retry
+              </button>
+            </div>
+          );
+        }
+
+        return (
+          <div>
+            <div className="page-header">
+              <h1>Our Products</h1>
+              <p>Discover amazing products at great prices</p>
+            </div>
+
+            <div className="filters">
+              <input
+                type="text"
+                placeholder="Search products..."
+                className="search-input"
+                value={search}
+                onChange={(e) => setSearch(e.target.value)}
+              />
+              <div className="category-filters">
+                {categories.map((cat) => (
+                  <button
+                    key={cat}
+                    className={`category-btn ${
+                      category === cat ? "active" : ""
+                    }`}
+                    onClick={() => setCategory(cat)}
+                  >
+                    {cat.charAt(0).toUpperCase() + cat.slice(1)}
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            {filtered.length === 0 ? (
+              <div className="loading">
+                <p>No products found matching your criteria.</p>
+              </div>
+            ) : (
+              <div className="products-grid">
+                {filtered.map((product) => (
+                  <div
+                    key={product.id}
+                    className="product-card"
+                    onClick={() => onNavigate("details", product.id)}
+                  >
+                    <div className="product-image-container">
+                      <img
+                        src={product.image}
+                        alt={product.name}
+                        className="product-image"
+                      />
+                      {product.stock < 10 && product.stock > 0 && (
+                        <span className="stock-badge low-stock">
+                          Only {product.stock} left
+                        </span>
+                      )}
+                      {product.stock === 0 && (
+                        <span className="stock-badge out-of-stock">
+                          Out of Stock
+                        </span>
+                      )}
+                    </div>
+                    <div className="product-info">
+                      <div className="product-category">{product.category}</div>
+                      <h3 className="product-name">{product.name}</h3>
+                      <p className="product-description">
+                        {product.description.substring(0, 60)}...
+                      </p>
+                      <div className="product-price">
+                        ${product.price.toFixed(2)}
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
+        );
+      };
+
+      // ============================================
+      // PRODUCT DETAILS PAGE
+      // ============================================
+      const ProductDetails = ({ productId, onNavigate }) => {
+        const [product, setProduct] = useState(null);
+        const [loading, setLoading] = useState(true);
+        const [error, setError] = useState(null);
+        const [quantity, setQuantity] = useState(1);
+        const [showSuccess, setShowSuccess] = useState(false);
+        const { addToCart } = useCart();
+
+        useEffect(() => {
+          fetchProduct();
+        }, [productId]);
+
+        const fetchProduct = async () => {
+          try {
+            setLoading(true);
+            const response = await fetch(`${API_URL}/products/${productId}`);
+            if (!response.ok) throw new Error("Product not found");
+            const data = await response.json();
+            setProduct(data);
+            setError(null);
+          } catch (err) {
+            console.error(err);
+            setError("Failed to load product details.");
+          } finally {
+            setLoading(false);
+          }
+        };
+
+        const handleAddToCart = () => {
+          if (product && quantity > 0) {
+            addToCart(product, quantity);
+            setShowSuccess(true);
+            setTimeout(() => setShowSuccess(false), 3000);
+          }
+        };
+
+        const handleQuantityChange = (e) => {
+          const value = parseInt(e.target.value) || 1;
+          setQuantity(Math.max(1, Math.min(value, product?.stock || 1)));
+        };
+
+        if (loading) return <Loading />;
+
+        if (error || !product) {
+          return (
+            <div className="error-container">
+              <p className="error-message">{error || "Product not found"}</p>
+              <button onClick={() => onNavigate("home")} className="retry-btn">
+                Back to Products
+              </button>
+            </div>
+          );
+        }
+
+        return (
+          <div>
+            <span className="back-link" onClick={() => onNavigate("home")}>
+              ← Back to Products
+            </span>
+
+            <div className="product-details">
+              <div className="product-detail-image-container">
+                <img
+                  src={product.image}
+                  alt={product.name}
+                  className="product-detail-image"
+                />
+              </div>
+
+              <div className="product-detail-info">
+                <div className="product-category">{product.category}</div>
+                <h1>{product.name}</h1>
+                <div className="product-detail-price">
+                  ${product.price.toFixed(2)}
+                </div>
+
+                <div className="stock-info">
+                  {product.stock > 0 ? (
+                    <span className="in-stock">
+                      ✓ In Stock ({product.stock} available)
+                    </span>
+                  ) : (
+                    <span style={{ color: "#e74c3c" }}>✗ Out of Stock</span>
+                  )}
+                </div>
+
+                <p className="product-detail-description">
+                  {product.description}
+                </p>
+
+                {product.stock > 0 && (
+                  <div>
+                    <div className="quantity-controls">
+                      <label style={{ marginRight: "10px", fontWeight: 600 }}>
+                        Quantity:
+                      </label>
+                      <button
+                        className="qty-btn"
+                        onClick={() => setQuantity(Math.max(1, quantity - 1))}
+                      >
+                        -
+                      </button>
+                      <input
+                        type="number"
+                        className="qty-input"
+                        value={quantity}
+                        onChange={handleQuantityChange}
+                        min="1"
+                        max={product.stock}
+                      />
+                      <button
+                        className="qty-btn"
+                        onClick={() =>
+                          setQuantity(Math.min(product.stock, quantity + 1))
+                        }
+                      >
+                        +
+                      </button>
+                    </div>
+
+                    <button
+                      className="add-to-cart-btn"
+                      onClick={handleAddToCart}
+                    >
+                      Add to Cart - ${(product.price * quantity).toFixed(2)}
+                    </button>
+
+                    {showSuccess && (
+                      <div className="success-message">
+                        ✓ Added to cart successfully!
+                      </div>
+                    )}
+                  </div>
+                )}
+
+                <div className="product-features">
+                  <h3>Product Features:</h3>
+                  <ul>
+                    <li>High quality materials</li>
+                    <li>1 year warranty</li>
+                    <li>Free shipping on orders over $50</li>
+                    <li>30-day return policy</li>
+                  </ul>
+                </div>
+              </div>
+            </div>
+          </div>
+        );
+      };
+
+      // ============================================
+      // CART PAGE
+      // ============================================
+      const Cart = ({ onNavigate }) => {
+        const {
+          cart,
+          updateQuantity,
+          removeFromCart,
+          getTotalPrice,
+          clearCart,
+        } = useCart();
+
+        const handleCheckout = () => {
+          alert(
+            "Checkout functionality would be implemented here!\n\nOrder Total: $" +
+              getTotalPrice().toFixed(2)
+          );
+          clearCart();
+          onNavigate("home");
+        };
+
+        const subtotal = getTotalPrice();
+        const tax = subtotal * 0.1;
+        const shipping = subtotal > 50 ? 0 : 5.99;
+        const total = subtotal + tax + shipping;
+
+        if (cart.length === 0) {
+          return (
+            <div className="empty-cart">
+              <h2>Your Cart is Empty</h2>
+              <p>Looks like you haven't added any items to your cart yet.</p>
+              <button
+                className="shop-now-btn"
+                onClick={() => onNavigate("home")}
+              >
+                Start Shopping
+              </button>
+            </div>
+          );
+        }
+
+        return (
+          <div>
+            <div className="page-header">
+              <h1>Shopping Cart</h1>
+              <p>
+                {cart.length} {cart.length === 1 ? "item" : "items"} in your
+                cart
+              </p>
+            </div>
+
+            <div className="cart-container">
+              <div>
+                {cart.map((item) => (
+                  <div key={item.id} className="cart-item">
+                    <img
+                      src={item.image}
+                      alt={item.name}
+                      className="cart-item-image"
+                    />
+
+                    <div className="cart-item-details">
+                      <h3 className="cart-item-name">{item.name}</h3>
+                      <div className="cart-item-price">
+                        ${item.price.toFixed(2)} each
+                      </div>
+
+                      <div
+                        className="quantity-controls"
+                        style={{ marginTop: "15px" }}
+                      >
+                        <button
+                          className="qty-btn"
+                          onClick={() =>
+                            updateQuantity(item.id, item.quantity - 1)
+                          }
+                        >
+                          -
+                        </button>
+                        <input
+                          type="number"
+                          className="qty-input"
+                          value={item.quantity}
+                          onChange={(e) => {
+                            const value = parseInt(e.target.value) || 1;
+                            updateQuantity(item.id, Math.max(1, value));
+                          }}
+                          min="1"
+                        />
+                        <button
+                          className="qty-btn"
+                          onClick={() =>
+                            updateQuantity(item.id, item.quantity + 1)
+                          }
+                        >
+                          +
+                        </button>
+                      </div>
+                    </div>
+
+                    <div className="cart-item-actions">
+                      <div className="cart-item-subtotal">
+                        ${(item.price * item.quantity).toFixed(2)}
+                      </div>
+                      <button
+                        className="remove-btn"
+                        onClick={() => removeFromCart(item.id)}
+                      >
+                        Remove
+                      </button>
+                    </div>
+                  </div>
+                ))}
+              </div>
+
+              <div className="cart-summary">
+                <h2>Order Summary</h2>
+
+                <div className="summary-row">
+                  <span>Subtotal:</span>
+                  <span>${subtotal.toFixed(2)}</span>
+                </div>
+
+                <div className="summary-row">
+                  <span>Tax (10%):</span>
+                  <span>${tax.toFixed(2)}</span>
+                </div>
+
+                <div className="summary-row">
+                  <span>Shipping:</span>
+                  <span>
+                    {shipping === 0 ? "FREE" : `$${shipping.toFixed(2)}`}
+                  </span>
+                </div>
+
+                {subtotal < 50 && (
+                  <p
+                    style={{
+                      fontSize: "14px",
+                      color: "#7f8c8d",
+                      marginTop: "10px",
+                      textAlign: "center",
+                    }}
+                  >
+                    Add ${(50 - subtotal).toFixed(2)} more for free shipping!
+                  </p>
+                )}
+
+                <div className="summary-divider"></div>
+
+                <div className="summary-row total">
+                  <span>Total:</span>
+                  <span>${total.toFixed(2)}</span>
+                </div>
+
+                <button className="checkout-btn" onClick={handleCheckout}>
+                  Proceed to Checkout
+                </button>
+
+                <button
+                  className="continue-shopping-btn"
+                  onClick={() => onNavigate("home")}
+                >
+                  Continue Shopping
+                </button>
+
+                <button className="clear-cart-btn" onClick={clearCart}>
+                  Clear Cart
+                </button>
+              </div>
+            </div>
+          </div>
+        );
+      };
+
+      // ============================================
+      // MAIN APP COMPONENT
+      // ============================================
+      const App = () => {
+        const [currentPage, setCurrentPage] = useState("home");
+        const [selectedProductId, setSelectedProductId] = useState(null);
+
+        const handleNavigate = (page, productId = null) => {
+          setCurrentPage(page);
+          setSelectedProductId(productId);
+          window.scrollTo(0, 0);
+        };
+
+        return (
+          <CartProvider>
+            <div>
+              <Header onNavigate={handleNavigate} />
+
+              <main className="main-content">
+                {currentPage === "home" && (
+                  <ProductList onNavigate={handleNavigate} />
+                )}
+                {currentPage === "details" && (
+                  <ProductDetails
+                    productId={selectedProductId}
+                    onNavigate={handleNavigate}
+                  />
+                )}
+                {currentPage === "cart" && <Cart onNavigate={handleNavigate} />}
+              </main>
+
+              <footer className="footer">
+                <p>&copy; 2024 E-Shop. All rights reserved.</p>
+              </footer>
+            </div>
+          </CartProvider>
+        );
+      };
+
+      // ============================================
+      // RENDER APP
+      // ============================================
+      ReactDOM.render(<App />, document.getElementById("root"));
+    </script>
+  </body>
+</html>
